@@ -98,6 +98,11 @@ mk
 
         Dictionary of processing settings used in initialization or other functions. Complete elements of the dictionary can be read/found at class parameter description.
 
+:   #### .NetworkDf <i> GeoDataFrame </i>
+
+    :   GeoDataFrame of network from input. Will be used to build networkx.Graph for network processing.
+
+        built-in entries point based functions such as .BetweenessPatronage, etc will save their results in a specified field name. Which then the variable can be obtained and modified as a GeoDataFrame, which can be edited, saved, filtered.
 
 :   #### .EntriesDf <i> GeoDataFrame </i>
 

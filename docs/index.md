@@ -29,7 +29,7 @@ installation by running package installation locally through clone or download t
 ## How to Use
 
 As Spatial Network Analysis is a derivative development of the Social Science Network Analysis, the conceptualization of the network is adjusted where in the object, path network as the medium is supplemented by end nodes that represents buildings, activity points, or Point of interest of the movement. Note that the polygon data of the network pathway is required to be segmented at each intersection, with maximum inaccuracy tollarance of 1e-3 on junctions, further than that distance will not be detected as a junction. Entrance data are not required to be located on the network lines, as there are built in functions to map entrance points into the network.
-Per Function documentation can be accessed in <u>[Documentation](https://github.com/kevinsutjijadi/SNAPy/Documentation)</u>
+Per Function documentation can be accessed in <u>[Documentation](https://kevinsutjijadi.github.io/SNAPyDocs/)</u>
 Most analysis tools included will require a network, consisting of polygon geometry pathway networks, and point geometry entrances in any GIS format readable by geopandas. Some testdata is provided in this repository, which contains a part of Jakarta's network line obtained by OSM API, as the following:  
 
 <img src="assets/SmplNetwork.png" width=70%/>
