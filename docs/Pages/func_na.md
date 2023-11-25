@@ -6,7 +6,7 @@ description: Spatial Network Analysis for Python Module
 # Spatial Network Analysis Functions
 
 Network Analysis functions
-mk
+
 ## GraphSims   <i> class </i>
 `#!python GraphSims(NetworkDf:GeoDataFrame, EntriesDf:GeoDataFrame, **kwargs)`
 
