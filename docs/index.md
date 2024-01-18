@@ -12,7 +12,7 @@ This is a documentation of the  <u>[:fontawesome-brands-github: SNAPy](https://g
 
 ## Authorship
 made by kevinsutjijadi @2023 Jakarta, Indonesia  
-Last updated at 2023/09/18
+Last updated at 2024/01/18
 
 ## Installation
 Module haven't been added to Pypi.
