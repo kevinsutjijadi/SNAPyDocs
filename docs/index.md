@@ -12,7 +12,7 @@ This is a documentation of the  <u>[:fontawesome-brands-github: SNAPy](https://g
 
 ## Authorship
 made by kevinsutjijadi @2023 Jakarta, Indonesia  
-Last updated at 2024/01/18
+Last updated at 2024/02/15
 
 ## Installation
 Module haven't been added to Pypi.
@@ -64,7 +64,7 @@ with the resulting nwSim.Gdf (can be displayed directly in conjunction with foli
 
 <img src="assets/SmplBtwnP.png" width=70%/>  
   
-Performance is designed to be RAM efficient, and more faster and reliable than former counterparts, but undeniably there are still a lot of room for development and streamlining process. Current build spends 90% to 99% (on larger networks) of runtime within the networkx functions; Such as has_path, shortest_path, and path iterators. Upon trial, using all cores of multithreading, process can be 2-10x faster than UNA Toolbox on Rhino and ArcGIS with the cost of multiple cores used. However single threading is slower. for example the following simulation of betweenness patronage of 279 origins and destinations permutaion, with search distance of 1200m and 1.2 detour ratio took 3'14" of multithread process on a i7-13700K without overclocking. Multiple paths may also cause significant time cost, as the same input with 1.0 detour ratio took only 9" to complete (21x faster).
+Performance is designed to be RAM efficient, and more faster and reliable than former counterparts, but undeniably there are still a lot of room for development and streamlining process. Current build spends 90% to 99% (on larger networks) of runtime within the networkx functions; Such as has_path, shortest_path, and path iterators. Upon trial, using all cores of multithreading, process can be somewhat faster than UNA Toolbox on Rhino and ArcGIS with the cost of multiple cores used. However single threading is slower. Multiple paths may also cause significant time cost, as the same input with 1.0 detour ratio took only 9" to complete (21x faster).
 
 <img src="assets/SmplBtwnP2.png" width=70%/>  
 
@@ -79,4 +79,4 @@ Performance is designed to be RAM efficient, and more faster and reliable than f
 - Dijkstra, E W (1959) A note on two problems in connexion with graphs.
 
 <br><br>
-@October2023
+@February2024

@@ -9,13 +9,12 @@ utilities in geometry and processing, with parts that help on data preparation a
 
 ### Data Preparations <i>Functions</i>
 
-#### NetworkSegmenIntersections <i> func </i>
+#### NetworkSegmentIntersections <i> func </i>
 `#!python NetworkSegmenIntersections(df, dfi=None, EndPoints=True, tol=1e-3)`
 
 :   returns 
     :   ndf : GeoDataFrame of segmented network
         pts : GeoDataFrame of endpoints and intersections
-    <i>GraphSims object</i>
 
     Segments network lines on each intersection points as a part of data preparation for GraphSims class.
 
@@ -58,6 +57,46 @@ utilities in geometry and processing, with parts that help on data preparation a
     nwSim = sna.GraphSims(dfNetworkSg, dfEntries, settings) # segmented lines to Graphsims
     ```
 
+#### NetworkSegmentDistance <i> func </i>
+`#!python NetworkSegmentDistance(df, dist:float=50.0)`
+
+:   returns 
+    :   ndf : GeoDataFrame of segmented network
+
+    Segments network lines to an approximate length according to projection units. I.e. a "metre" unit projection, where a line is 150m, with "dist" distance variable of 50m, it will seperate the line into 3 segments.
+
+    !!! info "Minimum length and segmentation rounding"
+        line lengths less than 1.5x than the segment distance will not be segmented. Segmentation rounding uses modulus operation to determine number of segments.
+    
+    !!! warning "Does not segment intersection"
+        Recommended to use this function AFTER using NetworkSegmentIntersection. Note that segmenting network into smaller segments will cause some/major computing time for any analysis.
+
+##### Parameters
+
+:   <b>df</b> : GeoDataFrame <i>required</i>
+    :   Geopandas GeoDataFrame object, of a network.
+
+:   <b>dist</b> : float default:50
+    :   float distance for base network segment distance.
+
+
+##### Use Example
+:   
+    ```python
+    import SNAPy as sna
+    import geopandas as gpd
+
+    dfNetwork = gpd.read_file('testdata\\Network.gpkg') # network dataframe
+
+    dfNetworkSg, IxPts = sna.NetworkSegmenIntersections(dfNetwork)
+
+    dfNetworkSg2 = sna.NetworkSegmenIntersections(dfNetworkSg, 100)
+
+    dfNetworkSg2.to_file("SegmentedNetwork.gpkg", layer="Network", crs="EPSG:32748", driver='GPKG') # geoDataFrame can be saved to GIS files
+
+    nwSim = sna.GraphSims(dfNetworkSg, dfEntries, settings) # segmented lines to Graphsims
+    ```
+
 
 <br><br>
-@January2024
+@February2024
