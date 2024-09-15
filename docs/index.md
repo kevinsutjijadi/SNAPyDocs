@@ -4,26 +4,34 @@ description: Spatial Network Analysis for Python Module
 ---
 <img src="assets/snapylogo_B.svg" width=60%/>
 
+
+
 # Spatial Network Analysis Python Module
 
-A package of spatial network analysis tools based on Geopandas dataframe and networkx pathfinding. Developed for regional scale spatial network analysis in Python environment for efficiency and better documentation. With capabilities of multithreading using multiprocessing.pool. Most functions and tools are based from <u>[Urban Network Analysis Toolbox](https://cityform.mit.edu/projects/urban-network-analysis.html)</u> by MIT City Form Lab, but there are some (Reach, Betweeness Patronage) that have different mathematical expression which is elaborated on the  documentation in this repository.
+A package of spatial network analysis tools based on Geopandas dataframe and custom pathfinding (SGACy). Developed for regional scale spatial network analysis in Python environment for efficiency and better documentation. Fast performance utilizing Cython optimized algorithms and capabilities for multithreading using multiprocessing.pool. Most functions and tools are based from <u>[Urban Network Analysis Toolbox](https://cityform.mit.edu/projects/urban-network-analysis.html)</u> by MIT City Form Lab.
 
 This is a documentation of the  <u>[:fontawesome-brands-github: SNAPy](https://github.com/kevinsutjijadi/SNAPy/tree/main)</u> library
 
+<img src="assets/mapshow_jakpusl.png" width=100%/>
+sample output page [here](/Samples/Jakpus_Sample_1.html)
+
 ## Authorship
 made by kevinsutjijadi @2023 Jakarta, Indonesia  
-Last updated at 2024/02/15
+Last updated at 2024/09/06
 
 ## Installation
-Module haven't been added to Pypi.
-installation by running package installation locally through clone or download the repository.
+available on pypi<br>
+<u>(https://pypi.org/project/snapy-toolbox/)</u>
+```terminal
+pip install snapy-toolbox
+```
 
 ## Requirements 
-- pandas >= 1.5.2
-- geopandas >= 0.9.0
-- networkx >= 2.7.1
+- pandas >= 1.5.3
+- geopandas >= 1.0.1
+- pydeck >= 0.8.0
 - scipy >= 1.10.0
-- numpy >= 1.24.1
+- numpy >= 1.23.5
 - shapely >= 2.0.0
 
 ## How to Use
@@ -60,14 +68,17 @@ Example analysis and result of the betweenness Patronage
 nwSim.BetweenessPatronage(OriWgt='Capacity', DestWgt='Weight', DetourR=1.2, SearchDist=1200, AlphaExp=0.1, RsltAttr='BtwnP')
 ```
 
-with the resulting nwSim.Gdf (can be displayed directly in conjunction with folium) as displayed below
+with the resulting nwSim.Gdf as displayed below, can be directly shown on jupyter using nwSim.Map_AddLayer('BtwnP') and nwSim.Map_Show()
 
 <img src="assets/SmplBtwnP.png" width=70%/>  
   
-Performance is designed to be RAM efficient, and more faster and reliable than former counterparts, but undeniably there are still a lot of room for development and streamlining process. Current build spends 90% to 99% (on larger networks) of runtime within the networkx functions; Such as has_path, shortest_path, and path iterators. Upon trial, using all cores of multithreading, process can be somewhat faster than UNA Toolbox on Rhino and ArcGIS with the cost of multiple cores used. However single threading is slower. Multiple paths may also cause significant time cost, as the same input with 1.0 detour ratio took only 9" to complete (21x faster).
+Performance is designed to be CPU optimized and RAM efficient, and more faster and reliable than former counterparts, but undeniably there are still a lot of room for development and streamlining process. Current build spends <30% (<60% on larger networks) of runtime within the pathfinding functions, SGACy, which is Cython based and quite optimized. Upon trial, using all cores of multithreading, process can be significantly faster than UNA Toolbox on Rhino and ArcGIS, upto 2 to 3 magnitude faster on runtime.
 
-<img src="assets/SmplBtwnP2.png" width=70%/>  
+Sample run of 141k entry points as origin-destination on a 74k edges as network. number of pairings near 141k^2 (about 19mil pairings), with search distance of 400m and DetourRatio of 1.1. Multithreading process on i7-13700K without overclocking, the process took about 88s.
 
+<img src="assets/qgis_jakpus1.png" width=100%/>  
+
+Further examples and use cases please check the <u>[Examples](/Pages/smpl_use/)</u> section
 
 ## References
 - Sevtsuk, A., & Mekonnen, M. (2012). Urban Network Analysis Toolbox. International Journal of Geomatics and Spatial Analysis, 22(2), 287–305.

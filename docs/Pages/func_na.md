@@ -11,14 +11,15 @@ Network Analysis functions
 `#!python GraphSims(NetworkDf:GeoDataFrame, EntriesDf:GeoDataFrame, **kwargs)`
 
 :   The core process for spatial network analysis is operated/structured within the `#!python Graphsims` Class, which reads Geopandas Geodataframe for entries and network data. The class initialization prepackages and compiles further processing and its subsequent results. main class for network analysis processing, initialization stage will have some heavy processes included. the processes in order
-
-    - adding Feature-ID of network and entrances as attribute if not found
-    - building networkx graph using BuildGraph from prcs_grph
-    - building entries data, appending with entrance/relation to graph related information.
-
-        !!! info "entries data dumping feature"
-            Since processing into the graph relation can take some time, there is the feature that saves and reads dump data from previous run through. The settings of this feature will be explained later at kwargs parameter.
     
+    - checking if network and entrances are the same projection and is_geographic (in meters)
+    - checking geometry type (linestring for network and points for entries. if network has multilinestring, it will convert the layer to linestring)
+    if the input data does not meet required prerequisite above, the initialization process will stop and raise exceptions.
+
+    - initial compiling of network nodes (junction points), if more than 30% of nodes are deadends, initialization process will offer to segment lines on intersections (SNAPy.NetworkSegmentIntersections(NetworkDf))
+    - adding Feature-ID of network and entrances as attribute if not found
+    - building graph on SGACy (Spatial Graph Analisis in Cython)
+    - building entries data, appending with entrance/relation to graph related information.
     - appending point coordinate as attributes unto EntriesDf
 
 
@@ -26,10 +27,10 @@ Network Analysis functions
     ##### Parameters
 
     :   <b>NetworkDf</b> : GeoDataFrame
-        :   Geopandas geodataframe of network data, containing edges in lines/polylines data form. Can contain weight multiplier for costs and also vertex classification, with the default 
+        :   Geopandas geodataframe of network data, containing edges in LineString data form. Can contain weight multiplier for costs and also vertex classification; with the default value for cost is geometrical length. 
 
     :   <b>EntriesDf</b> : GeoDataFrame
-        :   Geopandas geodataframe of Entries data, containing nodes in lines/polylines data form. Can contain weight
+        :   Geopandas geodataframe of Entries data, containing nodes in Point data form.
 
     :   <b>**kwargs</b> : Dict/keys-values
         :   Parameter arguments, that contain:
@@ -38,37 +39,33 @@ Network Analysis functions
 
                 search distance to closest edge of network, further distanced entrances will not be accounted
             
-            - `#!python "EntID" string `   default "FID"
+            - `#!python "EntID" string `   default "fid"
 
                 string of attribute/column name for Entrance Feature ID. If not found, will be automatically made in initialization process
 
-            - `#!python "EdgeID" string `   default "FID"
+            - `#!python "EdgeID" string `   default "fid"
 
                 string of attribute/column name for Network Feature ID. If not found, will be automatically made in initialization process
             
-            - `#!python "EdgeCost" string `   default None
+            - `#!python "AE_Lnlength" string `   default None
 
-                string of attribute/column name for Network cost multiplier, if None, all edges will use the value of "EdgeCostDef" argument
+                string of attribute/column name for Network cost multiplier, if None, all edges will use the value of its geometrical length
             
-            - `#!python "EdgeCostDef" string `   default 1.0
+            - `#!python "AE_LnlengthR" string `   default None
 
-                default value for edge cost, will only be applied if "EdgeCost" is None
-
-            - `#!python "EntryDtDump" bool `   default True
-
-                Switch to use entries data initialization results dumping. If true, then it will search for a pre-existing data dump, or if not found will make one at "Directory" argument location.
-
-            - `#!python "EntryDtDumpOvr" bool `   default False
-
-                Switch to overide pre-existing entries data dump. Only works if "EntryDtDump" is True. If there are updates on network or entries data, this argument is used.
+                string of attribute/column name for Network cost in reverse multiplier, if None, all edges will use the value of 'AR_Lnlength'
             
-            - `#!python "Directory" string `   default "\\dump"
+            - `#!python "AE_EdgeCost" string `   default None
 
-                entries data relation dump location.
+                Additional cost multiplier, if None will revert to 1.0
             
             - `#!python "Threads" int `   default 0
 
                 specify threads number for multiprocessing. For single core processing, input 1. The default value is 0, if which, will be replaced with (CPU count - 1), which almost fully utilizes CPU processing.
+            
+            - `#!python "SizeBuffer" float `   default 0.05
+
+                buffer multipler for edges and nodes array size in GraphCy, only important if additional addition to edges or nodes are done during process.
 
     ##### Use Example
     :   
@@ -78,16 +75,8 @@ Network Analysis functions
 
         dfNetwork = gpd.read_file('testdata\\NetworkClean.shp') # network dataframe
         dfEntries = gpd.read_file('testdata\\Features.gpkg', layer='Features') # entrance dataframe
-        
-        settings = {
-            'EntID': 'ID',
-            'EdgeID': 'ID',
-            'EdgeCost': 'Cost',
-            'EntryDtDumpOvr': True,
-            'Threads': 8,
-        }
 
-        nwSim = sna.GraphSims(dfNetwork, dfEntries, settings) # main class for loading network data
+        nwSim = sna.GraphSims(dfNetwork, dfEntries) # main class for loading network data
         ```
 
 ### GraphSims <i>Items</i>
@@ -100,37 +89,28 @@ Network Analysis functions
 
 :   #### .NetworkDf <i> GeoDataFrame </i>
 
-    :   GeoDataFrame of network from input. Will be used to build networkx.Graph for network processing.
+    :   GeoDataFrame of network from input, with parity with edges data in SGACy graph.
 
-        built-in entries point based functions such as .BetweenessPatronage, etc will save their results in a specified field name. Which then the variable can be obtained and modified as a GeoDataFrame, which can be edited, saved, filtered.
+        Functions that have results on edges such as .BetweenessPatronage, etc will save their results in a specified field name. Which then the variable can be obtained and modified as a GeoDataFrame, which can be edited, saved, filtered.
 
 :   #### .EntriesDf <i> GeoDataFrame </i>
 
-    :   GeoDataFrame of entries from input. From initialization process or reparametrization will be automatically appended intersection point coordinate as 'xPt_X' and 'xPt_Y'.
+    :   GeoDataFrame of entries from input. From initialization process or reparametrization will be automatically appended intersection point coordinate as 'xPt_X' and 'xPt_Y', and 'xLn_ID' for connected edge id.
 
         built-in entries point based functions such as .Reach, etc will save their results in a specified field name. Which then the variable can be obtained and modified as a GeoDataFrame, which can be edited, saved, filtered.
 
-
-:   #### .EntriesPt <i> Tuple </i>
-
-    :   contains a nested tuple of each point with information of the matching EntriesDf poin with the graph. Tuple structure of each point contains:
-        
-        - EntryDf point ID
-        - connected line/edge ID
-        - distance from entry point to intersection
-        - tuple of distance to the start and end nodes
-        - point of intersection
-        - tuple of connected network node ids
-        - weight of edge
-        - tuple of spliited shapely point
 
 :   #### .Gph <i> Graph </i>
 
     :   networkx Graph object from class initialization or reparametrization
 
-:   #### .EntPtDumpDir <i> string </i>
+:   #### .NodeDf <i> GeoDataFrame </i>
 
-    :   File name for dump file
+    :   GeodataFrame of network nodes, with the attribute 'JunctCnt', interger, of number of junctions/connections with edges of network. Will automatically initialize if used NetworkSegmentIntersections, but will be None initially. To access please use GraphSims.getNodes().
+
+:   #### .pdkLayers, .pdkLyrNm, .pdkCenter
+
+    :   Pydeck related values, see more at [visualisation related variables](../func_vis/#related-itemsvalues-in-graphsims-to-mapping)
 
 
 ### GraphSims <i>Functions</i>
@@ -139,24 +119,27 @@ Network Analysis functions
     `#!python BetweenessPatronage(self, OriID:Tuple=None, DestID:Tuple=None, **kwargs)`
 
     :   returns self.NetworkDf : GeoDataFrame <br>
-        <i>GraphSims.EntriesDf with the specified results column</i>
+        <i>GraphSims.NetworkDf with the specified results column</i>
 
-        Function for betweeness patronage, calculating segment traffic weighting from origin capacity, distributed through weightable destinations within the network in a set distance. Further elaboration on the method can be accessed on method documentation.
+        Function for betweeness patronage, calculating segment traffic weighting from origin capacity, distributed through weightable destinations within the network in a set distance. Further elaboration on the method can be accessed on [method documentation](../methods/#betweeness-patronage-functions).
+        Output appended on network/edges data on self.NetworkDf, but results on entries-destination on self.EntriesDf can also be aqcuired with setting Include_Destination : True in kwargs.
 
         !!! info "result return"
             results will be appended to self.NetworkDf, therefore the results can be accesed later so that the function does not need to be assigned into a new variable.
         
+        !!! info "origin-destination pairings"
+            It is acceptable to have the same id in origins and destinations, as the algorithm will skip/pass the calculations if the origin and destination has the same id.
+        
         !!! warning "processing duration"
-            function has built in multithreading capabilities using multiprocessing.Pool. Please take notice of self.baseSet['Threads'], as the value is also used in this function.
-            Larger models, larger search distance, larger detour ratio will be cause exponentially longer processing time.
+            Further distances will require exponentially longer time. Function has built in multithreading capabilities using multiprocessing.Pool. Please take notice of self.baseSet['Threads'], as the value is also used in this function.
 
     ##### Parameters
 
-    :   <b>OriID</b> : Tuple <i>default None</i>
-        :   Tuple of Origin point IDs, referencing `#!python GraphSims.EntriesDf` ID attribute specified at class initialization. If None, all 
+    :   <b>OriID</b> : list, tuple, np.array, geoseries <i>default None</i>
+        :   Set of registered IDs of entries acting as origins. Any iterable format that is compatible to geoDataFrame.isin() function. If None, all entries will be set as origins.
 
-    :   <b>DestID</b> : Tuple <i>default None</i>
-        :   Geopandas geodataframe of Entries data, containing nodes in lines/polylines data form. Can contain weight
+    :   <b>DestID</b> : list, tuple, np.array, geoseries <i>default None</i>
+        :   Set of registered IDs of entries acting as destinations. Any iterable format that is compatible to geoDataFrame.isin() function. If None, all entries will be set as destinations.
 
     :   <b>**kwargs</b> : Dict/keys-values
         :   Parameter arguments, that contain:
@@ -167,22 +150,23 @@ Network Analysis functions
                 There is a feature that skips any processing if the weighting value is 0.0
 
                 !!! warning "default values"
-                    if the attribute name is not found, there will be an automatic adjustment/appandage with the default value of 1
+                    if the attribute name is not found, there will be an automatic adjustment/appandage with the default value of 1.0
             
             - `#!python "DestWgt" string `   default "weight"
 
                 name of the attribute from self.EntriesDf to access weight value for destination points. In the context of Betweeness Patronage, the value will represent destination preference.
                 There is a feature that skips any processing if the weighting value is 0.0
+
                 !!! warning "default values"
-                    if the attribute name is not found, there will be an automatic adjustment/appandage with the default value of 1
+                    if the attribute name is not found, there will be an automatic adjustment/appandage with the default value of 1.0
             
             - `#!python "RsltAttr" string `   default "PatronBtwns"
 
-                Attribute name for the result. will be appended to self.NetworkDf.
+                Attribute name for the result. will be appended to self.NetworkDf. (And self.EntriesDf if Include_Destination set True)
             
             - `#!python "SearchDist" float `   default 1200.0
 
-                maximum path distance, corresponding to the data's units
+                Search distance from origin to destination in network distance. Note that origin-destination pairings that are close to SearchDist and have DetourR that may result in distances further than SearchDist will still append the path found.
             
             - `#!python "DetourR" float `   default 1.0
 
@@ -190,7 +174,28 @@ Network Analysis functions
             
             - `#!python "AlphaExp" float `   default 0.0
 
-                Exponent value for inverse distance function. if using default value of 0.0, the calculation turns into a linear inverse distance function.
+                Exponent value for inverse distance function. if using default value of 0.0, the calculation turns into a linear inverse distance function. See more at [method documentation](../methods/#betweeness-patronage-functions).
+            
+            - `#!python "AttrEdgeID" string `   default self.baseSet['EdgeID']
+
+                Edge ID attribute field name, default will be referring to self.baseSet['EdgeID'], which has a default of 'fid'.
+
+            - `#!python "AttrEntID" string `   default self.baseSet['EntID']
+
+                Entry ID attribute field name, default will be referring to self.baseSet['EntID'], which has a default of 'fid'.
+            
+            - `#!python "Include_Destination" bool `   default False
+
+                Included distribution of origin weight on destination entries. Note that this will also create a new attribute/field on self.EntriesDf but it won't be included as an ouptut of this function. To access results use GraphSims.EntriesDf.
+            
+            - `#!python "Threads" int|None `   default None
+
+                number of threads for processing, if None, threads will refer to self.baseSet['Threads']. Note that this will set self.baseSet['Threads'], impacting other processes. Set 0 to automatically set cpu_count - 1
+            
+            - `#!python "PathLim" int `   default 2000
+
+                Number of alternative path between an origin-destination pair. Paths generated are already very close to be sorted by distance. Process stopped if number of found paths exceed PathLim, so that further paths within DetourR range will not be detected/skipped.
+
     
     ##### Use Example
     :   
@@ -226,7 +231,7 @@ Network Analysis functions
     :   returns self.EntriesDf : GeoDataFrame <br>
         <i>GraphSims.EntriesDf with the specified results column</i>
 
-        Function for Reach related calculations. Further elaboration on the method can be accessed on method documentation. With the resulting information are counts/weighted sums/sums of destinations within reach, the results can also be interpreted as Centralities. Contains multiple Modes:
+        Function for Reach related calculations. Further elaboration on the method can be accessed on method documentation. With the resulting information are counts/weighted sums/sums of destinations within reach, the results can also be interpreted as Centralities. Further explanation on reach documentation can found on [method documentation](../methods/#reach-functions). Contains multiple Modes:
         
         - Mode="N" : Count Sum
             for counting destinations within reach distance, results in one new attribute of interger numbers
@@ -290,6 +295,10 @@ Network Analysis functions
             - `#!python "CalcComp" float `   default 0.6
 
                 Compunding multiplier for "WD" mode.
+            
+            - `#!python "Threads" int|None `   default None
+
+                number of threads for processing, if None, threads will refer to self.baseSet['Threads']. Note that this will set self.baseSet['Threads'], impacting other processes. Set 0 to automatically set cpu_count - 1
     
     ##### Use Example
 
@@ -348,6 +357,10 @@ Network Analysis functions
             - `#!python "CalcExp" float `   default 0.35
 
                 Exponent value for inverse distance function. if positive will calculate by distance exponent, with further destinations will result in larger weights. use negative numbers for inverse distance function.
+            
+            - `#!python "Threads" int|None `   default None
+
+                number of threads for processing, if None, threads will refer to self.baseSet['Threads']. Note that this will set self.baseSet['Threads'], impacting other processes. Set 0 to automatically set cpu_count - 1
 
     
     ##### Use Example
@@ -364,4 +377,4 @@ Network Analysis functions
 
 
 <br><br>
-@October2023
+@September2024

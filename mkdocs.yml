@@ -33,6 +33,8 @@ markdown_extensions:
   - pymdownx.mark
   - pymdownx.tilde
   - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
   
 theme:
   name: material
@@ -53,12 +55,13 @@ nav:
     - Network Analysis: "Pages/func_na.md"
     - Other Analysis: "Pages/func_ca.md"
     - Routine Analysis: "Pages/func_routines.md"
+    - Visualization: "Pages/func_vis.md"
     - Utilites: "Pages/func_ut.md"
+    - SGACy: "Pages/SGACy.md"
   - Method Documentation: "Pages/methods.md"
-  - Examples:
-    - Sample Uses: "Pages/smpl_use.md"
-    - Sample Cases: "Pages/smpl_case.md"
+  - Examples: "Pages/smpl.md"
   - About: "Pages/about.md"
+  - Roadmap: "Pages/roadmap.md"
 
 
 extra:
