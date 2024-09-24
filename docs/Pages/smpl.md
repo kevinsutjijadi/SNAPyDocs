@@ -7,14 +7,12 @@ description: Spatial Network Analysis for Python Module
 
 utilities in geometry and processing
 
-## Basic Uses
+## Introduction
 
-Basic Use of betweeness patronage in jupyter notebook.
-<u>[Sample Use Jupyter](https://github.com/kevinsutjijadi/SNAPy/tree/main/SampleUse.ipynb)</u>
+Introduction and basic use of library:<br>
+<u>[Sample Use Jupyter](https://github.com/kevinsutjijadi/SNAPyDocs/tree/main/Samples/00_Introduction.ipynb)</u>
+<br>Encompassing data loading, visualizing, analysis, and result documentation.
 
-!!! example "Work in Progress"
-    Contents of this page is still in progress
-    
 
 <br><br>
-@October2023
+@September2024

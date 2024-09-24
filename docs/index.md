@@ -12,12 +12,16 @@ A package of spatial network analysis tools based on Geopandas dataframe and cus
 
 This is a documentation of the  <u>[:fontawesome-brands-github: SNAPy](https://github.com/kevinsutjijadi/SNAPy/tree/main)</u> library
 
+
+  <!-- <iframe allowfullscreen sandbox  style="width: 100%; aspect-ratio:1;" src="assets/mapshow_jakpusl.png"></iframe> -->
+
+
 <img src="assets/mapshow_jakpusl.png" width=100%/>
 sample output page [here](/Samples/Jakpus_Sample_1.html)
 
 ## Authorship
 made by kevinsutjijadi @2023 Jakarta, Indonesia  
-Last updated at 2024/09/06
+Last updated at 2024/09/24
 
 ## Installation
 available on pypi<br>
@@ -25,6 +29,8 @@ available on pypi<br>
 ```terminal
 pip install snapy-toolbox
 ```
+!!! danger "Only Runs on Python 3.11 and currently, also only on Windows" 
+    Depending on cython built compilation, library will not run on python other than 3.11, and also only on Windows 64 bit!
 
 ## Requirements 
 - pandas >= 1.5.3
@@ -78,7 +84,7 @@ Sample run of 141k entry points as origin-destination on a 74k edges as network.
 
 <img src="assets/qgis_jakpus1.png" width=100%/>  
 
-Further examples and use cases please check the <u>[Examples](/Pages/smpl_use/)</u> section
+Further examples and use cases please check the <u>[Examples](/Pages/smpl/)</u> section
 
 ## References
 - Sevtsuk, A., & Mekonnen, M. (2012). Urban Network Analysis Toolbox. International Journal of Geomatics and Spatial Analysis, 22(2), 287–305.

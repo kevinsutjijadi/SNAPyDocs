@@ -376,5 +376,53 @@ Network Analysis functions
         ```
 
 
+:   #### .PathReach <i> func </i>
+    `#!python PatyReach(self, OriID:list, distance:float=800, joined:bool=False, incl_nodes=False, showmap=False, skip_layerinit=True, pdkupdate=False, **kwargs)`
+
+    :   returns edges : GeoDataFrame <br>
+
+        Returns a new dataframe containing geometries of edges that are within the reach radius from each origin entry, where each feature in output will have an appended origin ID.
+        
+        !!! warning "multiple outputs!"
+            the arguments 'incl_nodes', 'showmap', 'pdkupdate' will result in different return data and types. Read more on parameter description
+
+    ##### Parameters
+
+    :   <b>OriID</b> : Tuple <i>default None</i>
+        :   iterable object of Origin Entry Ids.
+
+    :   <b>distance</b> : float <i>default 800</i>
+        :   Distance limit of pathreach. Lines/edges will be split on this distance.
+    
+    :   <b>joined</b> : bool <i>default False</i>
+        :   Joins lines from all origins. Note that this will override/exclude origin entry id from results.
+
+    :   <b>incl_nodes</b> : bool <i>default False</i>
+        :   Output includes nodes on intersection, containing distance from origin information.
+    
+    :   <b>showmap</b> : bool <i>default False</i>
+        :   Outputs Pydeck Deck/Map instead of geodataframe. Shows the edges, nodes on intersection with labels of distance, and origin point.
+    
+    :   <b>skip_layerinit</b> : bool <i>default True</i>
+        :   Skips .Map_BaseLayerInit, so that output map will not include lines and other entries.
+
+    :   <b>pdkupdate</b> : bool <i>default False</i>
+        :   Outputs a list of Pydeck.Layers to replace or update previous pydeck.deck for update/interactive visualization. See more on [Samples](../smpl/)
+
+    :   <b>**kwargs</b> : Dict/keys-values
+        :   Parameter arguments, empty.
+
+    
+    ##### Use Example
+
+    :   
+        ```python
+        ### continuation from class initialization
+        ### nwSim = sna.GraphSims()
+
+        EdgesDf, NodeDf = nwSim.PathReach((1,), SearchDist=800, incl_nodes=True)
+        # unlike other GraphSims functions, PathReach results are not contained within the class.
+        ```
+
 <br><br>
 @September2024
