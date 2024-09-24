@@ -401,7 +401,7 @@ Network Analysis functions
         :   Output includes nodes on intersection, containing distance from origin information.
     
     :   <b>showmap</b> : bool <i>default False</i>
-        :   Outputs Pydeck Deck/Map instead of geodataframe. Shows the edges, nodes on intersection with labels of distance, and origin point.
+        :   Outputs Pydeck Deck/Map as the first input. Shows the edges, nodes on intersection with labels of distance, and origin point. Note that there are still edges and node output also appended in output
     
     :   <b>skip_layerinit</b> : bool <i>default True</i>
         :   Skips .Map_BaseLayerInit, so that output map will not include lines and other entries.
