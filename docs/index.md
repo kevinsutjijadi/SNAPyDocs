@@ -21,16 +21,18 @@ sample output page [here](/Samples/Jakpus_Sample_1.html)
 
 ## Authorship
 made by kevinsutjijadi @2023 Jakarta, Indonesia  
-Last updated at 2024/09/24
+Last updated at 2024/09/27
 
 ## Installation
 available on pypi<br>
+latest version is 0.2.14<br>
 <u>(https://pypi.org/project/snapy-toolbox/)</u>
 ```terminal
 pip install snapy-toolbox
 ```
-!!! danger "Only Runs on Python 3.11 and currently, also only on Windows" 
-    Depending on cython built compilation, library will not run on python other than 3.11, and also only on Windows 64 bit!
+!!! danger "Only Runs on Windows and partial iOS" 
+    On Windows only runs on python 3.11 & 3.12,<br>
+    On iOS only runs on arm cpus and only on python 3.12
 
 ## Requirements 
 - pandas >= 1.5.3
@@ -96,4 +98,4 @@ Further examples and use cases please check the <u>[Examples](/Pages/smpl/)</u> 
 - Dijkstra, E W (1959) A note on two problems in connexion with graphs.
 
 <br><br>
-@February2024
+@September2024
