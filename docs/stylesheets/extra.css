@@ -55,6 +55,13 @@
     background-color: var(--md-default-bg-color--hl);
 }
 
+.md-sidebar {
+    width: 300px;
+}
+
+.md-grid {
+    max-width: 85%;
+}
 
 .md-typeset blockquote {
     color: #96aac4;

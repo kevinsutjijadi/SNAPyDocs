@@ -156,7 +156,7 @@ Built in aggregate functions for multiple runs of the network analysis tools
             prefix string for all outputs.
         
         !!! info "additional arguments" 
-            Additional arguments can be added in this kwargs that are corresponding to the Reach's arguments. For example, DetourR, AlphaExp, etc.
+            Additional arguments can be added in this kwargs that are corresponding to BetweenessPatronage arguments. For example, DetourR, AlphaExp, etc. `GateIds`, `TermIds`, `TouchIds`, and `Include_Destination` are forwarded into every BetweenessPatronage call in the aggregate loop.
 
 ##### Use Example
 :   
@@ -170,14 +170,44 @@ Built in aggregate functions for multiple runs of the network analysis tools
 
     nwSim = sna.GraphSims(dfNetwork, dfEntries, settings)
 
-    dfPairs = pg.read_csv('testdata\\Pairs.csv')
-    dfMeasures = pg.read_csv('testdata\\Measures.csv') # routine dataframe
+    dfPairs = pd.read_csv('testdata\\Pairs.csv')
+    dfMeasures = pd.read_csv('testdata\\Measures.csv') # routine dataframe
 
     BetweenessPAggregate(nwSim, dfPairs, dfMeasures) # results does not need to be contained
 
     nwSim.NetworkDf.to_file("output.gpkg", layer="Entries", crs="EPSG:32748", driver='GPKG') # geoDataFrame can be saved to GIS files
     ```
 
+<br>
+#### GateFlowSum <i> func </i>
+`#!python GateFlowSum(GraphSm:GraphSims, names=None, RsltAttr='total')`
+
+:   returns DataFrame : summed gate-to-gate matrix, also stored at `GraphSm.GateFlow[RsltAttr]`
+
+    Adds selected `GateFlow` matrices. Each BetweenessPatronage / BetweenessPAggregate run already stores a **gate × gate** matrix (plus terminals and `open`) keyed by the run name. Movements are separate matrices, not axes. Use this to build a daily total from weekday runs. `TouchFlow[RsltAttr]` is the sum of the matching touch scalars.
+
+##### Parameters
+
+:   <b>GraphSm</b> : GraphSims <i>required</i>
+    :   GraphSims object that already has `GateFlow` matrices from BetweenessPatronage or BetweenessPAggregate.
+
+:   <b>names</b> : iterable <i>default None</i>
+    :   Keys of matrices to add. If None, every stored `GateFlow` matrix is included.
+
+:   <b>RsltAttr</b> : string <i>default 'total'</i>
+    :   Name of the summed matrix written to `GraphSm.GateFlow` and the summed scalar written to `GraphSm.TouchFlow`.
+
+##### Use Example
+:   
+    ```python
+    import SNAPy as sna
+
+    BetweenessPAggregate(nwSim, dfPairs, dfMeasures, GateIds=gate_ids, TermIds=term_ids)
+
+    daily = sna.GateFlowSum(nwSim, names=['AM_in', 'PM_out', 'offpeak'], RsltAttr='daily')
+    nwSim.GateFlow['daily']
+    ```
+
 
 <br><br>
-@December2023
+@October2026

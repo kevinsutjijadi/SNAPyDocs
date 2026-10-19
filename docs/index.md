@@ -13,26 +13,29 @@ A package of spatial network analysis tools based on Geopandas dataframe and cus
 This is a documentation of the  <u>[:fontawesome-brands-github: SNAPy](https://github.com/kevinsutjijadi/SNAPy/tree/main)</u> library
 
 
-  <!-- <iframe allowfullscreen sandbox  style="width: 100%; aspect-ratio:1;" src="assets/mapshow_jakpusl.png"></iframe> -->
+<div class="map">
+  <iframe src="/Samples/Jakpus_Sample_1.html" width=100% height="1000" frameborder="0" style="border: none;"></iframe>
+</div>
 
-
-<img src="assets/mapshow_jakpusl.png" width=100%/>
+<!-- <img src="assets/mapshow_jakpusl.png" width=100%/> -->
 sample output page [here](/Samples/Jakpus_Sample_1.html)
 
 ## Authorship
 made by kevinsutjijadi @2023 Jakarta, Indonesia  
-Last updated at 2024/09/27
+Last updated at 2026/10/19
 
 ## Installation
 available on pypi<br>
-latest version is 0.2.14<br>
+latest version is 0.3.00<br>
 <u>(https://pypi.org/project/snapy-toolbox/)</u>
 ```terminal
 pip install snapy-toolbox
 ```
-!!! danger "Only Runs on Windows and partial iOS" 
-    On Windows only runs on python 3.11 & 3.12,<br>
-    On iOS only runs on arm cpus and only on python 3.12
+!!! info "Supported platforms"
+    Prebuilt SGACy binaries ship for:<br>
+    Windows — Python 3.11 and 3.12<br>
+    Linux x86_64 — Python 3.11 and 3.12<br>
+    macOS (Darwin arm) — Python 3.12
 
 ## Requirements 
 - pandas >= 1.5.3
@@ -98,4 +101,4 @@ Further examples and use cases please check the <u>[Examples](/Pages/smpl/)</u> 
 - Dijkstra, E W (1959) A note on two problems in connexion with graphs.
 
 <br><br>
-@September2024
+@October2026

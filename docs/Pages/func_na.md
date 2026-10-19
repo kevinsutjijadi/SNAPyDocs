@@ -99,6 +99,14 @@ Network Analysis functions
 
         built-in entries point based functions such as .Reach, etc will save their results in a specified field name. Which then the variable can be obtained and modified as a GeoDataFrame, which can be edited, saved, filtered.
 
+:   #### .GateFlow <i> dict </i>
+
+    :   Dictionary of gate-to-gate matrices from BetweenessPatronage / BetweenessPAggregate when `GateIds` (and optional `TermIds`) are supplied. Keys are the run `RsltAttr` names. Each value is a pandas DataFrame, axes are gate ids + terminal ids + `open`. Sum selected runs with `GateFlowSum`.
+
+:   #### .TouchFlow <i> dict </i>
+
+    :   Dictionary of scalar touch counts keyed by the same `RsltAttr` names. Filled when `TouchIds` is supplied. `GateFlowSum` also writes the summed scalar under the same result key.
+
 
 :   #### .Gph <i> Graph </i>
 
@@ -122,7 +130,7 @@ Network Analysis functions
         <i>GraphSims.NetworkDf with the specified results column</i>
 
         Function for betweeness patronage, calculating segment traffic weighting from origin capacity, distributed through weightable destinations within the network in a set distance. Further elaboration on the method can be accessed on [method documentation](../methods/#betweeness-patronage-functions).
-        Output appended on network/edges data on self.NetworkDf, but results on entries-destination on self.EntriesDf can also be aqcuired with setting Include_Destination : True in kwargs.
+        Output appended on network/edges data on self.NetworkDf, but results on entries-destination on self.EntriesDf can also be aqcuired with setting Include_Destination : True in kwargs. Optional GateIds, TermIds, and TouchIds fill `self.GateFlow[RsltAttr]` and `self.TouchFlow[RsltAttr]` in the same path pass; the NetworkDf return is unchanged.
 
         !!! info "result return"
             results will be appended to self.NetworkDf, therefore the results can be accesed later so that the function does not need to be assigned into a new variable.
@@ -188,6 +196,29 @@ Network Analysis functions
 
                 Included distribution of origin weight on destination entries. Note that this will also create a new attribute/field on self.EntriesDf but it won't be included as an ouptut of this function. To access results use GraphSims.EntriesDf.
             
+            - `#!python "GateIds" array|None `   default None
+
+                Optional integer array, one value per network edge, same order as NetworkDf / path edge index. `0` means the edge is not a gate. The same positive id on several edges is one gate (split pieces of the same gate). When supplied (or with TermIds / TouchIds), each path also fills a from-to matrix stored at `self.GateFlow[RsltAttr]`. The NetworkDf return and edge result column stay unchanged.
+            
+            - `#!python "TermIds" dict|None `   default None
+
+                Optional mapping of entry id to a positive terminal id. Terminal ids must not overlap gate ids. Used with GateIds to record terminal-to-gate and gate-to-terminal flow.
+            
+            - `#!python "TouchIds" array|None `   default None
+
+                Optional integer array of edge indexes. Each path that touches any of those edges adds its person share once to `self.TouchFlow[RsltAttr]`. A path with no gate can still count here.
+
+                !!! info "from-to gate matrix"
+                    Consecutive same gate ids along a path are collapsed. Then one cell is filled:
+
+                    - origin is a terminal: from = that terminal, to = last gate on the path
+                    - destination is a terminal: from = first gate, to = that terminal
+                    - neither end is a terminal and two or more gates: first gate to last gate
+                    - only one gate and neither end is a terminal: that gate to open (`0`, labeled `open`)
+                    - no gate on the path: no matrix cell; TouchIds can still count
+
+                    Worker matrices are indexed `[0]` + sorted gate ids + sorted terminal ids and summed across threads. `0` is labeled `open` on the stored DataFrame. The matrix axes are always those place ids (gates, terminals, open). The movement / pair name is only the `RsltAttr` key on `self.GateFlow`. Sum several runs with `GateFlowSum`.
+            
             - `#!python "Threads" int|None `   default None
 
                 number of threads for processing, if None, threads will refer to self.baseSet['Threads']. Note that this will set self.baseSet['Threads'], impacting other processes. Set 0 to automatically set cpu_count - 1
@@ -223,6 +254,22 @@ Network Analysis functions
         for rn in runs:
             nwSim.BetweenessPatronage(OriWgt=rn[0], DestWgt=rn[1], SearchDist=rn[2], DetourR=rn[3], RsltAttr=rn[4]) # results does not need to be contained
         nwSim.NetworkDf.to_file("output.gpkg", layer="Entries", crs="EPSG:32748", driver='GPKG') # geoDataFrame can be saved to GIS files
+        ```
+
+        Optional gate-to-gate matrix in the same path pass. Edge traffic is still written to NetworkDf.
+
+        ```python
+        ### continuation from class initialization
+        ### nwSim = sna.GraphSims()
+
+        gate_ids = nwSim.NetworkDf['gate_id'].fillna(0).astype(int).to_numpy()
+        term_ids = {1: 9001, 2: 9001}  # entry fid -> terminal id
+
+        nwSim.BetweenessPatronage(
+            OriWgt='Capacity', DestWgt='Weight', SearchDist=800, DetourR=1.2,
+            RsltAttr='AM_in', GateIds=gate_ids, TermIds=term_ids,
+        )
+        nwSim.GateFlow['AM_in']  # from-to matrix; axes are gates / terminals / open
         ```
 
 :   #### .Reach <i> func </i>
@@ -425,4 +472,4 @@ Network Analysis functions
         ```
 
 <br><br>
-@September2024
+@October2026
